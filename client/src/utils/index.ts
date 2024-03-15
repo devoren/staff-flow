@@ -1,1 +1,3 @@
-export * as tw from "./tw";
+import { cn } from "./tailwind";
+
+export { cn };
