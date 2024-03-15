@@ -1,0 +1,17 @@
+{
+	"name": "staff-flow",
+	"version": "1.0.0",
+	"description": "StaffFlow: Employee Attendance Manager",
+	"main": "index.js",
+	"scripts": {
+		"install": "cd client && yarn install && cd ../server && npm install",
+		"server": "cd server && nodemon app.js",
+		"client": "cd client && yarn dev"
+	},
+	"keywords": [
+		"react",
+		"node"
+	],
+	"author": "Oren Nurkeldi",
+	"license": "ISC"
+}
