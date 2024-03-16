@@ -1,56 +1,48 @@
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
 
+import LoginDialog from "src/components/login";
 import { Button } from "src/components/ui/button";
-import { Input } from "src/components/ui/input";
-import { Label } from "src/components/ui/label";
-import { useToast } from "src/components/ui/use-toast";
 
 const Home = () => {
-	const { toast } = useToast();
 	const lsUser = localStorage.getItem("user");
-	const [user, setUser] = useState<string | undefined>(lsUser ?? "");
+	const [scanned, setScanned] = useState(false);
+	const [open, setOpen] = useState(false);
 
-	if (lsUser) {
-		return <Navigate to={"/board"} replace />;
-	}
-
-	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setUser(e.target.value);
+	const onScan = () => {
+		console.log("open camera");
 	};
 
-	const onSubmit = () => {
-		if (!user?.length) {
-			return toast({
-				description: "Пожалуйста, введите Ваше имя.",
-				variant: "destructive",
-			});
+	const handleScan = () => {
+		if (!lsUser) {
+			setOpen(true);
+			return;
 		}
 
-		localStorage.setItem("user", user);
-		toast({
-			description: "Вы успешно вошли в систему.",
-		});
+		onScan();
 	};
 
 	return (
-		<div className="flex justify-center h-dvh">
-			<div className="flex flex-col justify-center gap-4 max-w-screen-sm">
-				<h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl text-center">
-					StaffFlow: Employee Attendance Manager
-				</h1>
-				<p className="text-sm font-normal tracking-tight lg:text-xl text-center">
-					Пожалуйста, введите Ваше имя
-				</p>
-				<Label htmlFor="user">Имя</Label>
-				<Input
-					id="user"
-					placeholder="Имя"
-					value={user}
-					onChange={onChange}
-				/>
-				<Button onClick={onSubmit}>Войти</Button>
+		<div className="flex flex-col items-center justify-center gap-4">
+			<div className="mb-8">
+				{lsUser ? (
+					<h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl text-center">
+						{`Привет, ${lsUser}!`}
+					</h1>
+				) : (
+					<div className="flex flex-col gap-2">
+						<h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl text-center">
+							Добро пожаловать в StaffFlow
+						</h1>
+						<p className="text-xl font-normal tracking-tight lg:text-xl text-center">
+							Система учета и контроля рабочего времени
+						</p>
+					</div>
+				)}
 			</div>
+			<Button style={{ fontSize: 54 }} size={"xlg"} onClick={handleScan}>
+				Сканировать
+			</Button>
+			<LoginDialog open={open} setOpen={setOpen} onSubmit={onScan} />
 		</div>
 	);
 };
