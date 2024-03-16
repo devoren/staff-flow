@@ -5,7 +5,6 @@ import { getQR } from "src/api/qr";
 import Loader from "src/components/ui/loader";
 
 const Board = () => {
-	const lsUser = localStorage.getItem("user");
 	const [qr, setQr] = useState<string | null>(null);
 	const intervalId = useRef<NodeJS.Timeout | null>(null);
 
@@ -16,18 +15,14 @@ const Board = () => {
 	}, []);
 
 	useEffect(() => {
-		if (lsUser) {
-			intervalId.current = setInterval(() => {
-				getQR().then(({ data }) => {
-					setQr(data.token);
-				});
-			}, 10 * 60 * 1000);
-		} else {
-			clearInterval(intervalId.current as NodeJS.Timeout);
-		}
+		intervalId.current = setInterval(() => {
+			getQR().then(({ data }) => {
+				setQr(data.token);
+			});
+		}, 10 * 60 * 1000);
 
 		return () => clearInterval(intervalId.current as NodeJS.Timeout);
-	}, [lsUser]);
+	}, []);
 
 	return (
 		<div className="flex flex-col items-center justify-center gap-4">
