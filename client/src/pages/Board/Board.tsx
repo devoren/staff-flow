@@ -28,8 +28,11 @@ const Board = () => {
 		<div className="flex flex-col items-center justify-center gap-4">
 			<div className="mb-4">
 				<h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl text-center">
-					Пожалуйста, сканируйте QR код
+					Добро пожаловать в StaffFlow
 				</h1>
+				<h2 className="text-2xl font-medium tracking-tight lg:text-5xl text-center">
+					Пожалуйста, сканируйте QR код
+				</h2>
 			</div>
 			{qr ? <QRCode value={qr} size={512} /> : <Loader />}
 		</div>
