@@ -127,7 +127,9 @@ app.get("/api/qr", (req, res, next) => {
 
 	res.json({
 		message: "success",
-		token,
+		data: {
+			token,
+		},
 	});
 });
 
