@@ -5,21 +5,16 @@ import { Toaster } from "src/components/ui/toaster";
 
 import Board from "src/pages/Board";
 import Home from "src/pages/Home";
+import Dashboard from "src/pages/Dashboard";
 
 const App = () => {
 	return (
 		<>
 			<Routes>
-				<Route path="/" element={<Home />} />
-				<Route
-					path="/"
-					element={
-						<RequireAuth>
-							<Layout />
-						</RequireAuth>
-					}
-				>
+				<Route path="/" element={<Layout />}>
+					<Route path="/" element={<Home />} />
 					<Route index path="/board" element={<Board />} />
+					<Route index path="/dashboard" element={<Dashboard />} />
 					<Route
 						path="*"
 						element={<Navigate to={"/board"} replace />}
@@ -30,15 +25,5 @@ const App = () => {
 		</>
 	);
 };
-
-function RequireAuth({ children }: { children: JSX.Element }) {
-	const lsUser = localStorage.getItem("user");
-
-	if (!lsUser) {
-		return <Navigate to={"/"} replace />;
-	}
-
-	return children;
-}
 
 export default App;
