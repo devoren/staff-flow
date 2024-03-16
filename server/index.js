@@ -104,7 +104,7 @@ function verifyToken(res, token) {
 	return verified;
 }
 
-app.post("/api/users/scan", (req, res, next) => {
+app.post("/api/scan", (req, res, next) => {
 	let data = {
 		name: req.body.name,
 	};
