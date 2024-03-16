@@ -59,7 +59,7 @@ const LoginDialog: React.FC<LoginProps> = ({ open, setOpen, onSubmit }) => {
 			modal
 			onOpenChange={onOpenChange}
 		>
-			<DialogContent className="sm:max-w-[425px]">
+			<DialogContent className="sm:max-w-[425px] max-w-[360px] rounded-lg">
 				<DialogHeader>
 					<DialogTitle>Профиль</DialogTitle>
 					<DialogDescription>
@@ -67,8 +67,8 @@ const LoginDialog: React.FC<LoginProps> = ({ open, setOpen, onSubmit }) => {
 					</DialogDescription>
 				</DialogHeader>
 				<div className="grid gap-4 py-4">
-					<div className="grid grid-cols-4 items-center gap-4">
-						<Label htmlFor="name" className="text-right">
+					<div className="flex flex-col gap-4">
+						<Label htmlFor="name" className="text-left">
 							Имя
 						</Label>
 						<Input

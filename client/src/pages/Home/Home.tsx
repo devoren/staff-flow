@@ -39,7 +39,11 @@ const Home = () => {
 					</div>
 				)}
 			</div>
-			<Button style={{ fontSize: 54 }} size={"xlg"} onClick={handleScan}>
+			<Button
+				className="sm:text-6xl text-3xl"
+				size={"xlg"}
+				onClick={handleScan}
+			>
 				Сканировать
 			</Button>
 			<LoginDialog open={open} setOpen={setOpen} onSubmit={onScan} />
