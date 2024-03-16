@@ -34,7 +34,16 @@ const Board = () => {
 					Пожалуйста, сканируйте QR код
 				</h2>
 			</div>
-			{qr ? <QRCode value={qr} size={512} /> : <Loader />}
+			{qr ? (
+				<QRCode
+					value={qr}
+					size={
+						window.innerWidth < 640 ? window.innerWidth - 40 : 512
+					}
+				/>
+			) : (
+				<Loader />
+			)}
 		</div>
 	);
 };
