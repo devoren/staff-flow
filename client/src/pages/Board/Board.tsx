@@ -1,28 +1,25 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import QRCode from "react-qr-code";
-import { nanoid } from "nanoid";
 
-type Qr = {
-	value: string;
-	createdAt: Date;
-};
-
-const qrValue = nanoid(24);
+import { getQR } from "src/api/qr";
+import Loader from "src/components/ui/loader";
 
 const Board = () => {
 	const lsUser = localStorage.getItem("user");
-	const [qr, setQr] = useState<Qr>({
-		createdAt: new Date(),
-		value: qrValue,
-	});
+	const [qr, setQr] = useState<string | null>(null);
 	const intervalId = useRef<NodeJS.Timeout | null>(null);
+
+	useLayoutEffect(() => {
+		getQR().then(({ data }) => {
+			setQr(data.token);
+		});
+	}, []);
 
 	useEffect(() => {
 		if (lsUser) {
 			intervalId.current = setInterval(() => {
-				setQr({
-					createdAt: new Date(),
-					value: nanoid(24),
+				getQR().then(({ data }) => {
+					setQr(data.token);
 				});
 			}, 10 * 60 * 1000);
 		} else {
@@ -39,7 +36,7 @@ const Board = () => {
 					Пожалуйста, сканируйте QR код
 				</h1>
 			</div>
-			<QRCode value={qr.value} size={512} />
+			{qr ? <QRCode value={qr} size={512} /> : <Loader />}
 		</div>
 	);
 };
