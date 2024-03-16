@@ -40,6 +40,7 @@ const Board = () => {
 					size={
 						window.innerWidth < 640 ? window.innerWidth - 40 : 512
 					}
+					level="M"
 				/>
 			) : (
 				<Loader />
