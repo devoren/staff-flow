@@ -7,7 +7,8 @@ const db = require("./database.js");
 
 const app = express();
 const port = process.env.PORT || 3000;
-console.log(process.env.PORT);
+const qrSecret = process.env.QR_SECRET;
+
 app.use(
 	cors({
 		credentials: true,
@@ -25,7 +26,7 @@ app.get("/api/users", (req, res, next) => {
 	let params = [];
 	db.all(sql, params, (err, rows) => {
 		if (err) {
-			res.status(400).json({ error: err.message });
+			res.status(400).json({ message: err.message });
 			return;
 		}
 		res.json({
@@ -39,9 +40,8 @@ function getUser(res, name, callback) {
 	let sql = "select * from users where name = ?";
 	let params = [name];
 	db.get(sql, params, (err, row) => {
-		console.log("getUser", row);
 		if (err) {
-			res.status(400).json({ error: err.message });
+			res.status(400).json({ message: err.message });
 			return;
 		}
 		callback(row);
@@ -49,20 +49,22 @@ function getUser(res, name, callback) {
 }
 
 function createUser(res, data) {
+	var time = new Date().toISOString();
 	let sql = "INSERT INTO users (name, status, arrival_time) VALUES (?,?, ?)";
-	let params = [data.name, 1, new Date().toISOString()];
+	let params = [data.name, 1, time];
 	db.run(sql, params, function (err, result) {
-		console.log("createUser", { err, result });
 		if (err) {
-			res.status(400).json({ error: err.message });
-			return null;
+			res.status(400).json({ message: err.message });
+			return;
 		}
-		res.json({ message: "success", data: { ...data, status: 1 } });
+		res.json({
+			message: "success",
+			data: { ...data, status: 1, arrival_time: time, leave_time: null },
+		});
 	});
 }
 
 function updateUser(res, data) {
-	var mew;
 	let sql, params;
 	if (data.status === 1) {
 		sql = "UPDATE users SET status = 2, leave_time = ? WHERE name = ?";
@@ -73,35 +75,61 @@ function updateUser(res, data) {
 	params = [time, data.name];
 	db.run(sql, params, function (err, result) {
 		if (err) {
-			res.status(400).json({ error: err.message });
+			res.status(400).json({ message: err.message });
 			return;
 		}
 		res.json({
 			message: "success",
-			data: { ...data, status: data.status === 1 ? 2 : 1 },
+			data: {
+				...data,
+				status: data.status === 1 ? 2 : 1,
+				arrival_time: data.status === 2 ? time : data.arrival_time,
+				leave_time: data.status === 1 ? time : data.leave_time,
+			},
 		});
 	});
-	return mew;
+}
+
+function verifyToken(res, token) {
+	var verified = false;
+	jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+		if (err || decoded.secret !== qrSecret) {
+			res.status(403).json({ message: err.message });
+			verified = false;
+			return;
+		}
+		verified = true;
+	});
+
+	return verified;
 }
 
 app.post("/api/users/scan", (req, res, next) => {
 	let data = {
 		name: req.body.name,
 	};
-	getUser(res, data.name, (row) => {
-		if (row) {
-			updateUser(res, row);
-		} else {
-			createUser(res, data);
-		}
-	});
+	var verified = verifyToken(res, req.body.token);
+	if (verified) {
+		getUser(res, data.name, (row) => {
+			if (row) {
+				updateUser(res, row);
+			} else {
+				createUser(res, data);
+			}
+		});
+	}
 });
 
-// app.get("/api/qr", (req, res, next) => {
-// 	const token = jwt.sign({ key: "value"}, 'secret', {
-// 	expiresIn: '1h',
-// 	});
-// });
+app.get("/api/qr", (req, res, next) => {
+	const token = jwt.sign({ secret: qrSecret }, process.env.SECRET_KEY, {
+		expiresIn: "1m",
+	});
+
+	res.json({
+		message: "success",
+		token,
+	});
+});
 
 app.listen(port, () => {
 	console.log(`Server listening on port ${port}`);
