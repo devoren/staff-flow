@@ -1,15 +1,59 @@
+import { AxiosError } from "axios";
 import { useState } from "react";
 
+import { scanQR } from "src/api/qr";
 import LoginDialog from "src/components/login";
+import QrReader from "src/components/qrReader/QrReader";
 import { Button } from "src/components/ui/button";
+import { useToast } from "src/components/ui/use-toast";
+import { delay } from "src/utils";
 
 const Home = () => {
+	const { toast } = useToast();
 	const lsUser = localStorage.getItem("user");
-	const [scanned, setScanned] = useState(false);
+	const userStatus = localStorage.getItem("userStatus");
+	const [showQrReader, setShowQrReader] = useState(false);
 	const [open, setOpen] = useState(false);
+	const [isLoadingScan, setIsLoadingScan] = useState(false);
+	const [showSuccessScan, setShowSuccessScan] = useState(false);
 
-	const onScan = () => {
-		console.log("open camera");
+	const greeting = `Привет, ${lsUser}! Ваш статус: ${
+		userStatus === "1" ? "На работе" : "На Рахате"
+	}`;
+
+	const onScan = async () => {
+		setShowQrReader(true);
+	};
+
+	const onScanSuccess = (result: string) => {
+		if (lsUser) {
+			setIsLoadingScan(true);
+			scanQR({
+				name: lsUser,
+				token: result,
+			})
+				.then(({ data }) => {
+					setIsLoadingScan(false);
+					localStorage.setItem("userStatus", `${data.status}`);
+					setShowSuccessScan(true);
+					delay(1200).then(() => {
+						setShowSuccessScan(false);
+						setShowQrReader(false);
+					});
+				})
+				.catch((err: AxiosError<{ message: string }>) => {
+					setIsLoadingScan(false);
+					toast({
+						description: err.response?.data.message,
+						variant: "destructive",
+					});
+				});
+		} else {
+			toast({
+				description: "Вы не вошли в систему. Перезагрузите страницу.",
+				variant: "destructive",
+			});
+		}
 	};
 
 	const handleScan = () => {
@@ -21,12 +65,20 @@ const Home = () => {
 		onScan();
 	};
 
-	return (
+	return showQrReader ? (
+		<QrReader
+			show={showQrReader}
+			setShow={setShowQrReader}
+			onScanSuccess={onScanSuccess}
+			loading={isLoadingScan}
+			success={showSuccessScan}
+		/>
+	) : (
 		<div className="flex flex-col items-center justify-center gap-4">
 			<div className="mb-8">
 				{lsUser ? (
 					<h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl text-center">
-						{`Привет, ${lsUser}!`}
+						{userStatus ? greeting : `Привет, ${lsUser}!`}
 					</h1>
 				) : (
 					<div className="flex flex-col gap-2">

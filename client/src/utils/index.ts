@@ -1,3 +1,4 @@
 import { cn } from "./tailwind";
+import { delay } from "./helpers";
 
-export { cn };
+export { cn, delay };
