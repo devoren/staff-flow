@@ -94,8 +94,10 @@ function verifyToken(res, token) {
 	var verified = false;
 	jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
 		if (err || decoded.secret !== qrSecret) {
-			res.status(403).json({ message: err.message });
-			verified = false;
+			console.log("jwt error:", err.message);
+			res.status(403).json({
+				message: "QR-код недействителен или поврежден",
+			});
 			return;
 		}
 		verified = true;
@@ -105,6 +107,7 @@ function verifyToken(res, token) {
 }
 
 app.post("/api/scan", (req, res, next) => {
+	console.log("scanning....", new Date().getTime());
 	let data = {
 		name: req.body.name,
 	};
