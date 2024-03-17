@@ -28,7 +28,6 @@ const QrReader: React.FC<QrReaderProps> = ({
 	const [scanResult, setScanResult] = useState<string | null>(null);
 
 	const onScanFail = (err: string | Error) => {
-		console.log(err);
 		if (err !== "No QR code found") {
 			if (typeof err === "string") {
 				toast({
@@ -105,7 +104,7 @@ const QrReader: React.FC<QrReaderProps> = ({
 
 	return (
 		<div className="sm:px-20 w-full flex flex-col items-center gap-4">
-			<div className="relative w-full">
+			<div className="relative">
 				<video ref={videoEl}></video>
 				{loading && (
 					<div className="absolute inset-0 bg-black/70 z-99 flex items-center justify-center">

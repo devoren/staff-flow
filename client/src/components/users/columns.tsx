@@ -20,7 +20,7 @@ export const columns: ColumnDef<IUser>[] = [
 			if (status === 1) {
 				return "На работе";
 			} else {
-				return "На Рахате";
+				return "На рахате";
 			}
 		},
 	},

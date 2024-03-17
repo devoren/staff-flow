@@ -6,10 +6,12 @@ import LoginDialog from "src/components/login";
 import QrReader from "src/components/qrReader/QrReader";
 import { Button } from "src/components/ui/button";
 import { useToast } from "src/components/ui/use-toast";
+import { useSockets } from "src/context/socket";
 import { delay } from "src/utils";
 
 const Home = () => {
 	const { toast } = useToast();
+	const { socket } = useSockets();
 	const lsUser = localStorage.getItem("user");
 	const userStatus = localStorage.getItem("userStatus");
 	const [showQrReader, setShowQrReader] = useState(false);
@@ -18,7 +20,7 @@ const Home = () => {
 	const [showSuccessScan, setShowSuccessScan] = useState(false);
 
 	const greeting = `Привет, ${lsUser}! Ваш статус: ${
-		userStatus === "1" ? "На работе" : "На Рахате"
+		userStatus === "1" ? "На работе" : "На рахате"
 	}`;
 
 	const onScan = async () => {
@@ -36,9 +38,13 @@ const Home = () => {
 					setIsLoadingScan(false);
 					localStorage.setItem("userStatus", `${data.status}`);
 					setShowSuccessScan(true);
-					delay(1200).then(() => {
+					delay(1000).then(() => {
 						setShowSuccessScan(false);
 						setShowQrReader(false);
+					});
+					socket.emit("scan", {
+						user: lsUser,
+						status: userStatus,
 					});
 				})
 				.catch((err: AxiosError<{ message: string }>) => {
