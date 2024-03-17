@@ -9,10 +9,6 @@ function socket(io) {
 	io.on(EVENTS.connection, (socket) => {
 		console.log(`User connected ${socket.id}!`);
 
-		socket.on(EVENTS.CLIENT.GET_QR, (data) => {
-			console.log(data);
-		});
-
 		socket.emit("test", "value");
 		socket.on("scan", (data) => {
 			console.log("scan:", data);
