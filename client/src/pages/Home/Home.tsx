@@ -44,7 +44,7 @@ const Home = () => {
 					});
 					socket.emit("scan", {
 						user: lsUser,
-						status: userStatus,
+						status: data.status,
 					});
 				})
 				.catch((err: AxiosError<{ message: string }>) => {
