@@ -1,21 +1,30 @@
 const express = require("express");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const db = require("./database.js");
+const socket = require("./socket");
 
-const app = express();
 const port = process.env.PORT || 3000;
 const qrSecret = process.env.QR_SECRET;
 
+const app = express();
 app.use(
 	cors({
 		credentials: true,
 	})
 );
-app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+	cors: {
+		origins: "*",
+	},
+});
 
 app.get("/", (req, res) => {
 	res.send("Hello World!");
@@ -125,7 +134,7 @@ app.post("/api/scan", (req, res, next) => {
 
 app.get("/api/qr", (req, res, next) => {
 	const token = jwt.sign({ secret: qrSecret }, process.env.SECRET_KEY, {
-		expiresIn: "1m",
+		expiresIn: "10m",
 	});
 
 	res.json({
@@ -136,6 +145,8 @@ app.get("/api/qr", (req, res, next) => {
 	});
 });
 
-app.listen(port, () => {
+socket(io);
+
+httpServer.listen(port, () => {
 	console.log(`Server listening on port ${port}`);
 });
